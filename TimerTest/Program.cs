@@ -14,9 +14,9 @@ namespace TimerTest
 
         static void Main(string[] args)
         {
-            // noise
+            // noise: background threads
             {
-                for (int i = 0; i < 0; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Thread t = new Thread(Foo);
                     //t.Priority = ThreadPriority.BelowNormal;
@@ -27,7 +27,7 @@ namespace TimerTest
 
 
             Stopwatch timer = new Stopwatch();
-            TimeSpan idle = TimeSpan.FromMilliseconds(30);
+            TimeSpan idle = TimeSpan.FromMilliseconds(10);
 
             // test Thread.Sleep()
             for(int i = 0; i < 10; i++)
@@ -52,7 +52,7 @@ namespace TimerTest
 
         static void Foo()
         {
-            while (stop == false) if (_rnd.Next() % 2 == 0) Thread.Sleep(0);
+            while (stop == false) ; if (_rnd.Next() % 5 == 0) Thread.Sleep(0);
         }
     }
 }

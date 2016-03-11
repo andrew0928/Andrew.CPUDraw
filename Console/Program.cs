@@ -74,6 +74,12 @@ namespace Console
             return data;
         }
 
+        /// <summary>
+        /// 產生對照表，每個時段對應的附載數值。
+        /// </summary>
+        /// <param name="period">週期，圖形多久循環一次 (ms)?</param>
+        /// <param name="unit">每個時段的單位長度 (ms)</param>
+        /// <returns></returns>
         public static long[] GetDataFromSineWave(long period, long unit)
         {
             long steps = period / unit;
@@ -88,11 +94,15 @@ namespace Console
             return data;
         }
 
+        /// <summary>
+        /// 按照對照表的數據，將圖形用 CPU utilization 繪製出來
+        /// </summary>
         public static void DrawBitmap()
         {
             long unit = 100; // ms
             long period = 60 * 1000; // msec, full image time period
 
+            // get drawing data
             long[] data = GetDataFromBitmap(period, unit);
             //long[] data = GetDataFromSineWave(period, unit);
 
@@ -100,14 +110,16 @@ namespace Console
             timer.Restart();
             while (true)
             {
-                //long degree = (timer.ElapsedMilliseconds / unit) % 360;
                 long step = (timer.ElapsedMilliseconds / unit) % (period / unit);
                 long offset = (long)(timer.ElapsedMilliseconds % unit);
-                long v = data[step];//(long)(unit - (Math.Sin(Math.PI * degree / 180.0) / 2 + 0.5) * unit);
+                long v = data[step];
                 long idle_until = timer.ElapsedMilliseconds - offset + v;
                 long busy_until = timer.ElapsedMilliseconds - offset + unit;
 
+                // idle part
                 SpinWait.SpinUntil(() => { return (timer.ElapsedMilliseconds > idle_until); });
+
+                // busy part
                 while (timer.ElapsedMilliseconds < busy_until) ;
             }
         }
